@@ -13,31 +13,36 @@ const register = catchAsyncError(async (req, res, next) => {
   }
 
   const { name, email, password, role, status } = req.body;
-  try {
-    const existingUser = await User.findOne({ where: { email } });
-    if (existingUser) {
-      return next(new ErrorHandler("User Already Exists", 400));
-    }
 
-    const salt = await bcrypt.genSalt(10);
-    const hashedPassword = await bcrypt.hash(password, salt);
-
-    const newUser = await User.create({
-      name,
-      email,
-      password: hashedPassword,
-      role: role || "customer",
-      status: status || "active",
-    });
-
-    return res.status(201).json({
-      success: true,
-      message: "User Registered Successfully",
-      user: newUser,
-    });
-  } catch (error) {
-    return next(new ErrorHandler(error.message, 500));
+  const existingUser = await User.findOne({ where: { email } });
+  if (existingUser) {
+    return next(new ErrorHandler("User Already Exists", 400));
   }
+
+  const salt = await bcrypt.genSalt(10);
+  const hashedPassword = await bcrypt.hash(password, salt);
+
+  const newUser = await User.create({
+    name,
+    email,
+    password: hashedPassword,
+    role: role || "customer",
+    status: status || "active",
+    avatar: req.file ? req.file.path : "images/avatars/default.jpg",
+  });
+
+  return res.status(201).json({
+    success: true,
+    message: "User Registered Successfully",
+    user: {
+      id: newUser.id,
+      name: newUser.name,
+      email: newUser.email,
+      role: newUser.role,
+      status: newUser.status,
+      avatar: newUser.avatar,
+    },
+  });
 });
 
 // Login
@@ -50,37 +55,32 @@ const login = catchAsyncError(async (req, res, next) => {
   if (!email || !password) {
     return next(new ErrorHandler("Please Enter Email & Password", 400));
   }
-  try {
-    const user = await User.findOne({ where: { email } });
-    if (!user) {
-      return next(new ErrorHandler("Invalid Email or Password", 401));
-    }
 
-    const isPasswordMatched = await bcrypt.compare(password, user.password);
-    if (!isPasswordMatched) {
-      return next(new ErrorHandler("Invalid Email or Password", 401));
-    }
-
-    sendToken(user, 200, res);
-  } catch (error) {
-    return next(new ErrorHandler(error.message, 500));
+  const user = await User.findOne({ where: { email } });
+  if (!user) {
+    return next(new ErrorHandler("Invalid Email or Password", 401));
   }
+
+  const isPasswordMatched = await bcrypt.compare(password, user.password);
+  if (!isPasswordMatched) {
+    return next(new ErrorHandler("Invalid Email or Password", 401));
+  }
+  user.lastLogin = Date.now();
+  sendToken(user, 200, res);
 });
 
 const logout = catchAsyncError(async (req, res, next) => {
-  try {
-    res.cookie("token", null, {
-      expires: new Date(Date.now()),
-      httpOnly: true,
-      sameSite: "none",
-      secure: true,
-    });
+  res.cookie("token", null, {
+    expires: new Date(Date.now()),
+    httpOnly: true,
+    sameSite: "none",
+    secure: true,
+  });
 
-    res.status(200).json({
-      success: true,
-      message: "Logged Out Successfully",
-    });
-  } catch (error) {}
+  res.status(200).json({
+    success: true,
+    message: "Logged Out Successfully",
+  });
 });
 
 module.exports = { register, login, logout };

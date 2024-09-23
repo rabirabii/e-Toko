@@ -4,12 +4,12 @@ const app = express();
 const path = require("path");
 const multer = require("multer");
 const Sequalize = require("./database/db");
-const User = require("./database/Models/User");
+
 const { uploadAvatar, uploadProductImages } = require("./utils/multer");
 
 // Import Routes
 const Auth = require("./routes/Auth");
-
+const Customer = require("./routes/Customer");
 if (process.env.NODE_ENV !== "PRODUCTION") {
   require("dotenv").config({
     path: "config/.env",
@@ -53,3 +53,4 @@ app.listen(PORT, () => {
 });
 
 app.use("/api/auth", Auth);
+app.use("/api/customer", Customer);

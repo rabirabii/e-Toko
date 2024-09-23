@@ -16,7 +16,18 @@ const User = Sequalize.define("Users", {
     defaultValue: "customer",
     allowNull: false,
   },
-
+  avatar: {
+    type: DataTypes.STRING,
+    allowNull: true,
+    defaultValue: "images/avatars/default.png",
+  },
+  status: {
+    type: DataTypes.ENUM("active", "inactive"),
+    defaultValue: "active",
+    allowNull: false,
+  },
+  address: { type: DataTypes.STRING, allowNull: true },
+  phone: { type: DataTypes.STRING, allowNull: true },
   createdAt: {
     type: DataTypes.DATE,
     allowNull: false,
@@ -27,12 +38,20 @@ const User = Sequalize.define("Users", {
     allowNull: false,
     defaultValue: DataTypes.NOW,
   },
+  lastLogin: {
+    type: DataTypes.DATE,
+    allowNull: true,
+  },
 });
 
 User.prototype.getJwtToken = function () {
-  return jwt.sign({ id: this.id }, process.env.JWT_SECRET_KEY, {
-    expiresIn: process.env.JWT_EXPIRES,
-  });
+  return jwt.sign(
+    { id: this.id, role: this.role },
+    process.env.JWT_SECRET_KEY,
+    {
+      expiresIn: process.env.JWT_EXPIRES,
+    }
+  );
 };
 
 module.exports = User;
