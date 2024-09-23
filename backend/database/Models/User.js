@@ -1,6 +1,6 @@
 const { DataTypes } = require("sequelize");
 const Sequalize = require("../db");
-
+const jwt = require("jsonwebtoken");
 const User = Sequalize.define("Users", {
   id: { type: DataTypes.INTEGER, primaryKey: true, autoIncrement: true },
   name: { type: DataTypes.STRING, allowNull: false },
@@ -28,5 +28,11 @@ const User = Sequalize.define("Users", {
     defaultValue: DataTypes.NOW,
   },
 });
+
+User.prototype.getJwtToken = function () {
+  return jwt.sign({ id: this.id }, process.env.JWT_SECRET_KEY, {
+    expiresIn: process.env.JWT_EXPIRES,
+  });
+};
 
 module.exports = User;

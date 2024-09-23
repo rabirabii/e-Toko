@@ -1,8 +1,7 @@
 const User = require("../database/Models/User");
 const ErrorHandler = require("../utils/ErrorHandler");
+const { JWT_SECRET } = require("../utils/jwt_secret");
 const catchAsyncError = require("./catchAsyncError");
-
-const JWT_SECRET = process.env.JWT_SECRET;
 
 const isAuth = catchAsyncError(async (req, res, next) => {
   let token;

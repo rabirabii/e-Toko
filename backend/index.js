@@ -6,12 +6,16 @@ const multer = require("multer");
 const Sequalize = require("./database/db");
 const User = require("./database/Models/User");
 const { uploadAvatar, uploadProductImages } = require("./utils/multer");
+
+// Import Routes
+const Auth = require("./routes/Auth");
+
 if (process.env.NODE_ENV !== "PRODUCTION") {
   require("dotenv").config({
     path: "config/.env",
   });
 }
-
+console.log("JWT_SECRET:", process.env.JWT_SECRET_KEY);
 app.use(cors());
 app.use(express.json());
 app.use("/images", express.static(path.join(__dirname, "images")));
@@ -47,3 +51,5 @@ app.post("/upload/product-images", (req, res) => {
 app.listen(PORT, () => {
   console.log(`Server is running on PORT ${PORT}`);
 });
+
+app.use("/api/auth", Auth);
