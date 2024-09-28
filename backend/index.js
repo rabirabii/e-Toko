@@ -16,7 +16,12 @@ if (process.env.NODE_ENV !== "PRODUCTION") {
   });
 }
 console.log("JWT_SECRET:", process.env.JWT_SECRET_KEY);
-app.use(cors());
+const corsOptions = {
+  origin: "http://localhost:5173",
+  credentials: true,
+};
+
+app.use(cors(corsOptions));
 app.use(express.json());
 app.use("/images", express.static(path.join(__dirname, "images")));
 const PORT = process.env.Port;

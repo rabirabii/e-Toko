@@ -28,7 +28,7 @@ const register = catchAsyncError(async (req, res, next) => {
     password: hashedPassword,
     role: role || "customer",
     status: status || "active",
-    avatar: req.file ? req.file.path : "images/avatars/default.jpg",
+    avatar: req.file ? req.file.path : "images/avatars/default.png",
   });
 
   return res.status(201).json({

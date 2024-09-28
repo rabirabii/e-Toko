@@ -15,7 +15,14 @@ const loadUser = catchAsyncError(async (req, res, next) => {
   if (!user) {
     return next(new ErrorHandler("User not found with this id", 404));
   }
-  res.status(200).json({ success: true, user });
+  res.status(200).json({
+    success: true,
+    user: {
+      name: user.name,
+      email: user.email,
+      avatar: user.avatar || "/images/avatars/default.png",
+    },
+  });
 });
 
 const updateCustomerInfo = catchAsyncError(async (req, res, next) => {

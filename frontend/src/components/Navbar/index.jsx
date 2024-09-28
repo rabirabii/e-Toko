@@ -1,10 +1,21 @@
-import React from "react";
+import React, { useEffect } from "react";
 import { Bell, Menu, Moon, Search, Settings, Sun } from "lucide-react";
 import { Input } from "../ui/input";
 import { useDispatch, useSelector } from "react-redux";
 import { toggleSidebar, toggleTheme } from "../../Redux";
 import { Avatar, AvatarFallback, AvatarImage } from "../ui/avatar";
 import { Link } from "react-router-dom";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuLabel,
+  DropdownMenuSeparator,
+} from "../ui/dropdown-menu";
+import { DropdownMenuTrigger } from "@radix-ui/react-dropdown-menu";
+import { Button } from "../ui/button";
+import { logoutCustomer } from "../../Redux/Reducer/auth";
+
 const Navbar = () => {
   const dispatch = useDispatch();
   const isSidebarCollapsed = useSelector(
@@ -12,12 +23,26 @@ const Navbar = () => {
   );
   const isDarkMode = useSelector((state) => state.global.isDarkMode);
 
+  const user = useSelector((state) => state.customer.customer);
+
   const ButtonSidebar = () => {
     dispatch(toggleSidebar(!isSidebarCollapsed));
   };
 
   const toggleDarkMode = () => {
     dispatch(toggleTheme(!isDarkMode));
+  };
+
+  useEffect(() => {
+    console.log("User in Navbar: ", user);
+  }, [user]);
+
+  const handleLogout = () => {
+    dispatch(logoutCustomer())
+      .unwrap()
+      .then(() => {
+        console.log("Logout success");
+      });
   };
   return (
     <div className="flex justify-between items-center w-full mb-7">
@@ -61,15 +86,38 @@ const Navbar = () => {
           <hr className="w-0 h-7 border-solid border-1 border-gray-300 mx-3" />
           <div className="flex items-center gap-3 cursor-pointer">
             <Avatar>
-              <AvatarImage src="/default.png" alt="avatar" />
+              <AvatarImage
+                src={
+                  user?.avatar
+                    ? `http://localhost:5001/${user.avatar}`
+                    : "/images/avatars/default.png"
+                }
+                alt="avatar"
+              />
               <AvatarFallback>Profile</AvatarFallback>
             </Avatar>
-            <span className="font-semibold">User</span>
+            <span className="font-semibold"> {user ? user.name : "Guest"}</span>
           </div>
         </div>
-        <Link>
-          <Settings className="cursor-pointer text-gray-500" size={24} />
-        </Link>
+        <DropdownMenu>
+          <DropdownMenuTrigger asChild>
+            <Settings className="cursor-pointer text-gray-500" size={24} />
+          </DropdownMenuTrigger>
+          <DropdownMenuContent>
+            <DropdownMenuLabel className=" text-center pr-3 mr-3">
+              Settings
+            </DropdownMenuLabel>
+            <DropdownMenuSeparator />
+            <DropdownMenuItem>
+              <Button variant="ghost">My Profile</Button>
+            </DropdownMenuItem>
+            <DropdownMenuItem>
+              <Button variant="ghost" onClick={handleLogout}>
+                Logout
+              </Button>
+            </DropdownMenuItem>
+          </DropdownMenuContent>
+        </DropdownMenu>
       </div>
     </div>
   );
