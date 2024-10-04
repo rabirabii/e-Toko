@@ -6,7 +6,7 @@ const multer = require("multer");
 const Sequalize = require("./database/db");
 
 const { uploadAvatar, uploadProductImages } = require("./utils/multer");
-
+require("./database");
 // Import Routes
 const Auth = require("./routes/Auth");
 const Customer = require("./routes/Customer");
