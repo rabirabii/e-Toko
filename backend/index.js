@@ -10,6 +10,8 @@ require("./database");
 // Import Routes
 const Auth = require("./routes/Auth");
 const Customer = require("./routes/Customer");
+const Product = require("./routes/Product");
+
 if (process.env.NODE_ENV !== "PRODUCTION") {
   require("dotenv").config({
     path: "config/.env",
@@ -59,3 +61,4 @@ app.listen(PORT, () => {
 
 app.use("/api/auth", Auth);
 app.use("/api/customer", Customer);
+app.use("/api/products", Product);

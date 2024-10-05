@@ -1,5 +1,5 @@
-const { Op } = require("sequelize");
-const { User, Category, Product } = require("../database");
+const { Op, Sequelize } = require("sequelize");
+const { User, Category, Product, Review } = require("../database");
 const catchAsyncError = require("../middleware/catchAsyncError");
 const ErrorHandler = require("../utils/ErrorHandler");
 const { parse } = require("dotenv");
@@ -8,12 +8,8 @@ const { parse } = require("dotenv");
 const createProduct = catchAsyncError(async (req, res, next) => {
   const { name, description, price, categoryId, quantity } = req.body;
 
-  const seller = await User.findByPk(req.user.id);
-
-  if (!seller || seller.role !== "seller") {
-    return next(new ErrorHandler("Only seller can create a product", 403));
-  }
-
+  const seller = req.user.id;
+  console.log("Seller ID:", seller);
   const category = await Category.findByPk(categoryId);
 
   if (!category) {
@@ -28,7 +24,7 @@ const createProduct = catchAsyncError(async (req, res, next) => {
     categoryId,
     quantity,
     images: req.body.images || [],
-    sellerId: req.user.id,
+    sellerId: seller,
   });
 
   res.status(201).json({
@@ -142,9 +138,9 @@ const getAllProducts = catchAsyncError(async (req, res, next) => {
   } = req.query;
 
   const offset = (page - 1) * limit;
-
   const whereClause = {};
 
+  // Filter by category
   if (category) {
     const categoryRecord = await Category.findOne({
       where: { name: category },
@@ -154,6 +150,7 @@ const getAllProducts = catchAsyncError(async (req, res, next) => {
     }
   }
 
+  // Filter by price range
   if (price) {
     const priceRange = price.split("-");
     if (priceRange.length === 2) {
@@ -163,57 +160,82 @@ const getAllProducts = catchAsyncError(async (req, res, next) => {
     }
   }
 
-  if (rating) {
-    whereClause.rating = {
-      [Op.gte]: parseFloat(rating),
-    };
-  }
-
+  // Search by product name
   if (search) {
     whereClause.name = {
-      [Op.like]: `%${search}%`,
+      [Op.iLike]: `%${search}%`,
     };
   }
 
-  let order = [];
-  if (sort === "price_asc") {
-    order.push(["price", "ASC"]);
-  } else if (sort === "price_desc") {
-    order.push(["price", "DESC"]);
-  } else if (sort === "rating_asc") {
-    order.push(["rating", "ASC"]);
-  } else if (sort === "rating_desc") {
-    order.push(["rating", "DESC"]);
+  // Parse rating parameter
+  let minRating, maxRating;
+
+  if (rating) {
+    const ratingParts = rating.split("-");
+    if (ratingParts.length === 2) {
+      // Rentang rating
+      minRating = parseFloat(ratingParts[0]);
+      maxRating = parseFloat(ratingParts[1]);
+    } else {
+      // Hanya satu nilai rating
+      minRating = parseFloat(rating);
+      maxRating = 5;
+    }
+  } else {
+    minRating = 0;
+    maxRating = 5;
   }
 
-  const products = await Product.findAndCountAll({
+  // Fetch products with rating filter
+  const products = await Product.findAll({
     where: whereClause,
     include: [
       {
         model: User,
         as: "seller",
-        attributes: ["id", "name", "email"],
+        attributes: ["id", "name"],
       },
       {
         model: Category,
         as: "category",
         attributes: ["id", "name"],
       },
+      {
+        model: Review,
+        as: "reviews",
+        attributes: [],
+      },
     ],
-    order,
+    attributes: {
+      include: [
+        [Sequelize.fn("AVG", Sequelize.col("reviews.rating")), "averageRating"],
+        [Sequelize.fn("COUNT", Sequelize.col("reviews.id")), "reviewCount"],
+      ],
+    },
+    group: ["Products.id", "seller.id", "category.id"],
+    having: Sequelize.where(
+      Sequelize.fn("AVG", Sequelize.col("reviews.rating")),
+      {
+        [Op.between]: [minRating, maxRating],
+      }
+    ),
+    order: sort ? [[getSortOrder(sort)]] : [],
     limit: parseInt(limit),
     offset,
+    subQuery: false,
   });
 
-  const totalPages = Math.ceil(products.count / limit);
+  // Pagination information
+  const totalProducts = await Product.count({ where: whereClause });
+  const totalPages = Math.ceil(totalProducts / limit);
 
   res.status(200).json({
     success: true,
-    products: products.rows,
+    products,
     pagination: {
       currentPage: parseInt(page),
       totalPages,
-      totalProducts: products.count,
+      totalProducts,
     },
   });
 });
