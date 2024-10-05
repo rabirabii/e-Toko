@@ -23,6 +23,22 @@ const Product = Sequalize.define("Products", {
     allowNull: false,
     defaultValue: DataTypes.NOW,
   },
+  categoryId: {
+    type: DataTypes.INTEGER,
+    allowNull: false,
+    references: {
+      model: Category,
+      key: "id",
+    },
+  },
+  sellerId: {
+    type: DataTypes.INTEGER,
+    allowNull: false,
+    references: {
+      model: User,
+      key: "id",
+    },
+  },
 });
 
 module.exports = Product;
