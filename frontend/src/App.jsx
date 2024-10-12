@@ -4,7 +4,7 @@ import { Button } from "./components/ui/button";
 import Navbar from "./components/Navbar";
 import { Route, Routes } from "react-router-dom";
 import DashboardWrapper from "./Layout/DashboardWrapper";
-import Homepage from "./Pages/Homepage";
+
 import Login from "./Pages/Login";
 import Register from "./Pages/Register";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
@@ -12,6 +12,9 @@ import { ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import { store } from "./Redux/store";
 import { loadCustomer } from "./Redux/Reducer/Customer";
+import DashboardHome from "./Pages/DashboardHome";
+import Homepage from "./Pages/E-Commerce/Homepage";
+import EcommerceLayout from "./Layout/EcommerceLayout";
 const queryClient = new QueryClient();
 function App() {
   const [count, setCount] = useState(0);
@@ -28,12 +31,20 @@ function App() {
             path="/"
             element={
               <DashboardWrapper>
-                <Homepage />
+                <DashboardHome />
               </DashboardWrapper>
             }
           />
           <Route path="/login" element={<Login />} />
           <Route path="/register" element={<Register />} />
+          <Route
+            path="/homepage"
+            element={
+              <EcommerceLayout>
+                <Homepage />
+              </EcommerceLayout>
+            }
+          />
         </Routes>
       </QueryClientProvider>
     </div>

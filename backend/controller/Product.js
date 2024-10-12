@@ -2,7 +2,6 @@ const { Op, Sequelize } = require("sequelize");
 const { User, Category, Product, Review } = require("../database");
 const catchAsyncError = require("../middleware/catchAsyncError");
 const ErrorHandler = require("../utils/ErrorHandler");
-const { parse } = require("dotenv");
 
 // Create A Product
 const createProduct = catchAsyncError(async (req, res, next) => {
@@ -167,17 +166,14 @@ const getAllProducts = catchAsyncError(async (req, res, next) => {
     };
   }
 
-  // Parse rating parameter
   let minRating, maxRating;
 
   if (rating) {
     const ratingParts = rating.split("-");
     if (ratingParts.length === 2) {
-      // Rentang rating
       minRating = parseFloat(ratingParts[0]);
       maxRating = parseFloat(ratingParts[1]);
     } else {
-      // Hanya satu nilai rating
       minRating = parseFloat(rating);
       maxRating = 5;
     }
@@ -186,7 +182,6 @@ const getAllProducts = catchAsyncError(async (req, res, next) => {
     maxRating = 5;
   }
 
-  // Fetch products with rating filter
   const products = await Product.findAll({
     where: whereClause,
     include: [
@@ -225,7 +220,6 @@ const getAllProducts = catchAsyncError(async (req, res, next) => {
     subQuery: false,
   });
 
-  // Pagination information
   const totalProducts = await Product.count({ where: whereClause });
   const totalPages = Math.ceil(totalProducts / limit);
 

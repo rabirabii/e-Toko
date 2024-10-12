@@ -85,39 +85,49 @@ const Navbar = () => {
           </div>
           <hr className="w-0 h-7 border-solid border-1 border-gray-300 mx-3" />
           <div className="flex items-center gap-3 cursor-pointer">
-            <Avatar>
-              <AvatarImage
-                src={
-                  user?.avatar
-                    ? `http://localhost:5001/${user.avatar}`
-                    : "/images/avatars/default.png"
-                }
-                alt="avatar"
-              />
-              <AvatarFallback>Profile</AvatarFallback>
-            </Avatar>
-            <span className="font-semibold"> {user ? user.name : "Guest"}</span>
+            {user ? (
+              <>
+                <Avatar>
+                  <AvatarImage
+                    src={
+                      user?.avatar
+                        ? `http://localhost:5001/${user.avatar}`
+                        : "/images/avatars/default.png"
+                    }
+                    alt="avatar"
+                  />
+                  <AvatarFallback>Profile</AvatarFallback>
+                </Avatar>
+                <span className="font-semibold"> {user.name}</span>
+              </>
+            ) : (
+              <Button variant="ghost" as={Link} to="/login">
+                Login
+              </Button>
+            )}
           </div>
         </div>
-        <DropdownMenu>
-          <DropdownMenuTrigger asChild>
-            <Settings className="cursor-pointer text-gray-500" size={24} />
-          </DropdownMenuTrigger>
-          <DropdownMenuContent>
-            <DropdownMenuLabel className=" text-center pr-3 mr-3">
-              Settings
-            </DropdownMenuLabel>
-            <DropdownMenuSeparator />
-            <DropdownMenuItem>
-              <Button variant="ghost">My Profile</Button>
-            </DropdownMenuItem>
-            <DropdownMenuItem>
-              <Button variant="ghost" onClick={handleLogout}>
-                Logout
-              </Button>
-            </DropdownMenuItem>
-          </DropdownMenuContent>
-        </DropdownMenu>
+        {user && (
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <Settings className="cursor-pointer text-gray-500" size={24} />
+            </DropdownMenuTrigger>
+            <DropdownMenuContent>
+              <DropdownMenuLabel className=" text-center pr-3 mr-3">
+                Settings
+              </DropdownMenuLabel>
+              <DropdownMenuSeparator />
+              <DropdownMenuItem>
+                <Button variant="ghost">My Profile</Button>
+              </DropdownMenuItem>
+              <DropdownMenuItem>
+                <Button variant="ghost" onClick={handleLogout}>
+                  Logout
+                </Button>
+              </DropdownMenuItem>
+            </DropdownMenuContent>
+          </DropdownMenu>
+        )}
       </div>
     </div>
   );
