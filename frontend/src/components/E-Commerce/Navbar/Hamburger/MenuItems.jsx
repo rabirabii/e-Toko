@@ -1,6 +1,8 @@
 import React from "react";
 import { motion } from "framer-motion";
 import { Link } from "react-router-dom";
+import StaggeredHeroes from "../../StaggeredHeroes";
+import { Separator } from "../../../ui/separator";
 
 const variants = {
   open: {
@@ -25,14 +27,19 @@ const MenuItems = ({ name, href, icon: Icon, onClick }) => {
       variants={variants}
       whileHover={{ scale: 1.03 }}
       whileTap={{ scale: 0.95 }}
-      className="mb-2"
+      className="mb-2 overflow-y-auto"
     >
       <Link
         to={href}
-        className="flex items-center gap-4 px-4 py-3 text-gray-700 hover:bg-gray-100 rounded-lg transition-colors duration-150 ease-in-out"
+        className="flex flex-col items-start gap-4 px-4 py-4 my-4 text-gray-700 hover:bg-gray-100 rounded-lg transition-colors duration-150 ease-in-out "
         onClick={onClick}
       >
-        <span className="text-lg font-medium">{name}</span>
+        <span>
+          <StaggeredHeroes className="text-lg font-medium">
+            {name}
+          </StaggeredHeroes>
+        </span>
+        <Separator className="w-full" />
       </Link>
     </motion.li>
   );

@@ -46,7 +46,7 @@ const Navbar = () => {
   };
   return (
     <div className="flex justify-between items-center w-full mb-7">
-      <div className="flex justify-between items-center gap-5">
+      <div className="flex relative max-w-frame mx-auto items-center justify-between md:justify-start py-5 md:py-6 px-4 xl:px-0">
         <button
           onClick={ButtonSidebar}
           className="px-3 py-3 bg-gray-100 rounded-full hover:bg-blue-100"

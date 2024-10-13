@@ -1,8 +1,34 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+@font-face {
+  font-family: "IntegralCF";
+  src: url("/Fonts/Integral CF/Fontspring-DEMO-integralcf-bold.otf")
+    format("opentype");
+  font-weight: normal;
+  font-style: normal;
+}
+@font-face {
+  font-family: "Proxima Nova";
+  src: url("/Fonts/Proxima Nova/Fontspring-DEMO-proximanova-regular.otf")
+    format("opentype");
+  font-weight: normal;
+  font-style: normal;
+}
+@font-face {
+  font-family: "Lora";
+  src: url("/Fonts/Lora/static/Lora-Bold.otf") format("opentype");
+  font-weight: normal;
+  font-style: normal;
+}
+@font-face {
+  font-family: "Lora";
+  src: url("/Fonts/Lora/static/Lora-Italic.otf") format("opentype");
+  font-weight: normal;
+  font-style: normal;
+}
 @layer base {
   :root {
-    --radius: 0.5rem
+    --radius: 0.5rem;
   }
 }

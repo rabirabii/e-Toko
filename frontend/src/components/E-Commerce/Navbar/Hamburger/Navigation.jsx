@@ -1,7 +1,8 @@
 import React from "react";
 import { motion } from "framer-motion";
-import { navItems } from "../navItems";
+import { navItems, socialMediaLinks } from "../navItems";
 import MenuItems from "./MenuItems";
+import { Link } from "react-router-dom";
 
 const variants = {
   open: {
@@ -12,17 +13,45 @@ const variants = {
   },
 };
 
-const Navigation = () => {
+const Navigation = ({ toggleOpen }) => {
+  // Filter out the main navigation and social media links
+  const mainNavItems = navItems.filter((item) => !item.isSocial);
+  const socialNavItems = socialMediaLinks.filter((item) => item.isSocial);
+
   return (
-    <motion.ul variants={variants} className="p-4 mt-12">
-      {navItems.map((item) => (
+    <motion.ul
+      variants={variants}
+      className="p-4 flex flex-col mt-[34px] h-full"
+    >
+      {/* Main Navigation Items */}
+      {mainNavItems.map((item) => (
         <MenuItems
           key={item.name}
           name={item.name}
           href={item.path}
           icon={item.icon}
+          onClick={toggleOpen}
         />
       ))}
+
+      {/* Spacer to push icons to the bottom */}
+      <div className="flex-grow"></div>
+
+      {/* Social Media Icons at the bottom */}
+      <div className="flex items-center justify-center gap-12 mt-auto mb-8">
+        {socialNavItems.map((item) => (
+          <a
+            key={item.name}
+            href={item.path}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="text-gray-700 hover:text-gray-900"
+            onClick={toggleOpen}
+          >
+            {item.icon && <item.icon className="w-6 h-6" />}
+          </a>
+        ))}
+      </div>
     </motion.ul>
   );
 };

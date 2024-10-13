@@ -1,7 +1,14 @@
 import React from "react";
+import Heroes from "../../../components/E-Commerce/Heroes";
+import Brands from "../../../components/E-Commerce/Brands";
 
-const Homepage = () => {
-  return <div>Homepage</div>;
+const homepage = () => {
+  return (
+    <div>
+      <Heroes />
+      <Brands />
+    </div>
+  );
 };
 
-export default Homepage;
+export default homepage;
